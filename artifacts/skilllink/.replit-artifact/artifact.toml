@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "SkillLink Kenya"
+description = "A trusted marketplace for customers in Kenya to find verified fundis, send job requests, and track everyday repairs and maintenance work."
+version = "1.0.0"
+id = "artifacts/skilllink"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18740
+
+[services.development]
+run = "pnpm --filter @workspace/skilllink run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/skilllink", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/skilllink/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18740"
+BASE_PATH = "/"

@@ -1,0 +1,42 @@
+import { type ReactNode, useState } from 'react';
+import { Link, useLocation } from 'wouter';
+import { ArrowRight, Menu, Search, ShieldCheck, UserRound, X } from 'lucide-react';
+import { getSession, services } from '@/lib/store';
+
+export function Logo() {
+  return <Link href="/" className="flex items-center gap-2.5" data-testid="link-logo"><span className="logo-mark"><ShieldCheck size={18} strokeWidth={2.5} /></span><span className="font-semibold tracking-[-.03em]">SkillLink <span className="text-primary">Kenya</span></span></Link>;
+}
+
+export function Header() {
+  const [open, setOpen] = useState(false);
+  const [location] = useLocation();
+  const session = getSession();
+  const links = [{ href: '/search', label: 'Find a Fundi' }, { href: '/how-it-works', label: 'How It Works' }, { href: '/auth?role=fundi', label: 'Become a Fundi' }];
+  return <header className="sticky top-0 z-40 border-b border-border/70 bg-background/90 backdrop-blur-xl">
+    <div className="container-wide flex h-[70px] items-center justify-between">
+      <Logo />
+      <nav className="hidden items-center gap-7 md:flex" aria-label="Primary navigation">{links.map((link) => <Link key={link.href} href={link.href} className={`text-[13px] font-medium transition-colors hover:text-primary ${location === link.href ? 'text-primary' : 'text-muted-foreground'}`} data-testid={`link-nav-${link.label.toLowerCase().replaceAll(' ', '-')}`}>{link.label}</Link>)}</nav>
+      <div className="hidden items-center gap-4 md:flex">{session ? <Link href="/dashboard" className="flex items-center gap-2 text-sm font-semibold text-foreground" data-testid="link-dashboard"><span className="grid h-8 w-8 place-items-center rounded-full bg-secondary text-primary"><UserRound size={15} /></span>{session.name.split(' ')[0]}</Link> : <><Link href="/auth" className="text-[13px] font-medium text-muted-foreground hover:text-foreground" data-testid="link-login">Log in</Link><Link href="/auth?mode=signup" className="rounded-full bg-primary px-4 py-2.5 text-[13px] font-semibold text-primary-foreground shadow-[0_5px_14px_rgba(28,170,88,.2)] transition-transform hover:-translate-y-0.5" data-testid="link-get-started">Get Started</Link></>}</div>
+      <button className="rounded-lg p-2 md:hidden" onClick={() => setOpen(!open)} aria-label="Toggle menu" data-testid="button-mobile-menu">{open ? <X size={21} /> : <Menu size={21} />}</button>
+    </div>
+    {open && <div className="border-t border-border bg-background px-5 py-4 md:hidden"><nav className="flex flex-col gap-1">{links.map((link) => <Link onClick={() => setOpen(false)} key={link.href} href={link.href} className="rounded-lg px-3 py-3 text-sm font-medium hover:bg-secondary">{link.label}</Link>)}{session ? <Link onClick={() => setOpen(false)} href="/dashboard" className="rounded-lg px-3 py-3 text-sm font-medium text-primary">Dashboard</Link> : <div className="mt-2 flex gap-2 border-t border-border pt-3"><Link onClick={() => setOpen(false)} href="/auth" className="flex-1 rounded-full border border-border px-4 py-2.5 text-center text-sm font-semibold">Log in</Link><Link onClick={() => setOpen(false)} href="/auth?mode=signup" className="flex-1 rounded-full bg-primary px-4 py-2.5 text-center text-sm font-semibold text-primary-foreground">Get Started</Link></div>}</nav></div>}
+  </header>;
+}
+
+export function Footer() {
+  return <footer className="mt-24 border-t border-border bg-[#edf4ed]"><div className="container-wide grid gap-10 py-12 md:grid-cols-[1.5fr_1fr_1fr_1fr]"><div><Logo /><p className="mt-4 max-w-xs text-sm leading-6 text-muted-foreground">Connecting Kenya with trusted, identity-checked fundis for everyday jobs.</p></div><div><p className="mb-4 text-xs font-bold uppercase tracking-[.14em] text-muted-foreground">For customers</p><div className="space-y-3 text-sm"><Link href="/search" className="block hover:text-primary">Find a Fundi</Link><Link href="/how-it-works" className="block hover:text-primary">How It Works</Link><Link href="/auth" className="block hover:text-primary">Create an account</Link></div></div><div><p className="mb-4 text-xs font-bold uppercase tracking-[.14em] text-muted-foreground">For fundis</p><div className="space-y-3 text-sm"><Link href="/auth?role=fundi" className="block hover:text-primary">Become a Fundi</Link><Link href="/how-it-works#fundis" className="block hover:text-primary">Why SkillLink</Link></div></div><div><p className="mb-4 text-xs font-bold uppercase tracking-[.14em] text-muted-foreground">SkillLink Kenya</p><p className="text-sm leading-6 text-muted-foreground">Built for the people and places that keep Kenya moving.</p></div></div><div className="container-wide flex flex-col gap-2 border-t border-border/70 py-5 text-xs text-muted-foreground sm:flex-row sm:justify-between"><span>© 2025 SkillLink Kenya</span><span>Trusted work starts here.</span></div></footer>;
+}
+
+export function Shell({ children }: { children: ReactNode }) { return <><Header /><main className="page-enter">{children}</main><Footer /></>; }
+export function ButtonLink({ href, children, variant = 'primary', icon = true }: { href: string; children: React.ReactNode; variant?: 'primary' | 'outline' | 'quiet'; icon?: boolean }) {
+  const classes = variant === 'primary' ? 'bg-primary text-primary-foreground shadow-[0_8px_20px_rgba(28,170,88,.18)]' : variant === 'outline' ? 'border border-border bg-card text-foreground' : 'bg-secondary text-secondary-foreground';
+  return <Link href={href} className={`group inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(28,170,88,.13)] ${classes}`} data-testid={`link-cta-${String(children).toLowerCase().replaceAll(' ', '-')}`}>{children}{icon && <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />}</Link>;
+}
+export function Avatar({ initials, accent = '#d8eee0', size = 'md' }: { initials: string; accent?: string; size?: 'sm' | 'md' | 'lg' }) { const sizeClass = size === 'lg' ? 'h-16 w-16 text-lg' : size === 'sm' ? 'h-9 w-9 text-xs' : 'h-12 w-12 text-sm'; return <span className={`${sizeClass} grid shrink-0 place-items-center rounded-full font-bold text-[#175239]`} style={{ background: accent }}>{initials}</span>; }
+export function SectionEyebrow({ children }: { children: React.ReactNode }) { return <p className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[.18em] text-primary"><span className="h-1.5 w-1.5 rounded-full bg-accent" />{children}</p>; }
+export function SearchBar({ compact = false }: { compact?: boolean }) {
+  const [, setLocation] = useLocation();
+  const [service, setService] = useState('');
+  const [location, setLocalLocation] = useState('');
+  return <form className={`flex ${compact ? 'flex-col gap-2 sm:flex-row' : 'flex-col gap-3'} rounded-2xl border border-border bg-card p-2.5 shadow-[var(--shadow-soft)]`} onSubmit={(event) => { event.preventDefault(); setLocation(`/search?service=${encodeURIComponent(service)}&location=${encodeURIComponent(location)}`); }}><label className="flex min-w-0 flex-1 flex-col px-3 py-1.5"><span className="text-[10px] font-bold uppercase tracking-[.1em] text-muted-foreground">Service needed</span><select value={service} onChange={(e) => setService(e.target.value)} className="mt-1 w-full bg-transparent text-sm font-medium outline-none" data-testid="select-service"><option value="">Choose a service</option>{services.map((item) => <option key={item.name}>{item.name}</option>)}</select></label><label className="flex min-w-0 flex-1 flex-col border-t border-border px-3 py-1.5 sm:border-l sm:border-t-0"><span className="text-[10px] font-bold uppercase tracking-[.1em] text-muted-foreground">Your location</span><input value={location} onChange={(e) => setLocalLocation(e.target.value)} placeholder="e.g. Kilimani, Nairobi" className="mt-1 w-full bg-transparent text-sm font-medium outline-none placeholder:text-muted-foreground/60" data-testid="input-location" /></label><button className="flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground transition-transform hover:-translate-y-0.5" type="submit" data-testid="button-find-fundi"><Search size={16} />Find a Fundi</button></form>;
+}
