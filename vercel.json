@@ -1,0 +1,11 @@
+{
+  "buildCommand": "pnpm --filter @workspace/skilllink run build",
+  "outputDirectory": "artifacts/skilllink/dist/public",
+  "rewrites": [
+    { "source": "/search", "destination": "/index.html" },
+    { "source": "/how-it-works", "destination": "/index.html" },
+    { "source": "/auth", "destination": "/index.html" },
+    { "source": "/dashboard", "destination": "/index.html" },
+    { "source": "/fundi/:id", "destination": "/index.html" }
+  ]
+}
