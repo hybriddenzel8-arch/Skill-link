@@ -36,6 +36,8 @@ export type Job = {
   service: string;
   location: string;
   details: string;
+  preferredDate?: string;
+  preferredTime?: string;
   status: JobStatus;
   createdAt: string;
   history: { status: JobStatus; date: string; note: string }[];
@@ -50,6 +52,7 @@ export const services = [
   { name: 'General Repairs', detail: 'Reliable fixes around your home' },
   { name: 'Masonry', detail: 'Walls, tiling, plaster and concrete' },
   { name: 'Mechanics', detail: 'Vehicle servicing and repairs' },
+  { name: 'Plumbing', detail: 'Leaks, pipes, taps, drains and water fixtures' },
 ];
 
 const seedFundis: Fundi[] = [
@@ -86,7 +89,7 @@ export function saveSession(user: User | null) { write('skilllink-session', user
 export function saveUsers(users: User[]) { write('skilllink-users', users); }
 export function saveJobs(jobs: Job[]) { write('skilllink-jobs', jobs); }
 export function saveFundis(fundis: Fundi[]) { write('skilllink-fundis', fundis); }
-export function createJob(data: Pick<Job, 'customerId' | 'customerName' | 'service' | 'location' | 'details'> & Partial<Pick<Job, 'fundiId' | 'fundiName'>>) {
+export function createJob(data: Pick<Job, 'customerId' | 'customerName' | 'service' | 'location' | 'details'> & Partial<Pick<Job, 'fundiId' | 'fundiName' | 'preferredDate' | 'preferredTime'>>) {
   const now = new Date();
   const date = now.toISOString().slice(0, 10);
   const created: Job = { ...data, id: `j${Date.now()}`, status: 'Requested', createdAt: date, history: [{ status: 'Requested', date: now.toLocaleDateString('en-KE', { day: '2-digit', month: 'short' }), note: data.fundiName ? `Request sent to ${data.fundiName}` : 'Request posted to trusted fundis' }] };
